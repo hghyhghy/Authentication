@@ -20,7 +20,7 @@ export class UsersService{
       const hashedPassword = await bcrypt.hash(password, 10);
       
       // Create a new user entity
-      const user = this.usersRepository.create({ username, email, password: hashedPassword });
+      const user = this.usersRepository.create({ username, email, password:hashedPassword});
       
       // Save the user to the database
       return await this.usersRepository.save(user);
