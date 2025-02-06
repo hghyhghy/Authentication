@@ -1,17 +1,28 @@
 'use client';
-import { useState, FormEvent, useEffect } from 'react';
+
+import { useState, useEffect, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+
+// Blog type definition
+type Blog = {
+  id: number;
+  title: string;
+  content: string;
+};
 
 export default function AuthPage() {
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isLogin, setIsLogin] = useState<boolean>(true);
-  const [isClient, setIsClient] = useState<boolean>(false);
   const [error, setError] = useState<string>(''); // State for error message
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const router = useRouter();
 
-  // Ensure that the component runs on the client-side
   useEffect(() => {
-    setIsClient(true);
+    fetch("http://localhost:3000/blogs")
+      .then((res) => res.json())
+      .then((data) => setBlogs(data));
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -31,7 +42,7 @@ export default function AuthPage() {
 
       if (response.status === 200) {
         // Redirect to blogs page on successful login
-        window.location.href = '/blogs'; // Assuming the blogs page is hosted on the same app
+        router.push('/blogs'); // Using Next.js router for navigation
       } else {
         setError(responseBody.message || 'Invalid credentials, please try again.');
       }
@@ -39,10 +50,6 @@ export default function AuthPage() {
       setError('An error occurred. Please try again later.');
     }
   };
-
-  if (!isClient) {
-    return null;
-  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -104,6 +111,19 @@ export default function AuthPage() {
         >
           {isLogin ? 'Need an account? Signup' : 'Already have an account? Login'}
         </button>
+      </div>
+      {/* Blog List */}
+      <div className="mt-10 w-full max-w-3xl">
+        {blogs.map((blog) => (
+          <div
+            key={blog.id}
+            className="border p-4 mb-4 cursor-pointer"
+            onClick={() => router.push(`/blog/${blog.id}`)}
+          >
+            <h2 className="text-xl font-bold">{blog.title}</h2>
+            <p>{blog.content.slice(0, 100)}...</p>
+          </div>
+        ))}
       </div>
     </div>
   );

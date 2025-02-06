@@ -30,4 +30,9 @@ export class BlogsService{
         const newBlog = this.blogsRepository.create({title,content})
         return this.blogsRepository.save(newBlog)
     }
+
+    async getBlogById(id:number):Promise<Blog|null>{
+
+        return await this.blogsRepository.findOne({where:{id}})
+    }
 }

@@ -1,21 +1,30 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
 interface Blog {
   id: number;
   title: string;
   content: string;
 }
 
-export default function BlogList({ blogs }: { blogs: Blog[] }) {
+interface BlogListProps {
+  blogs: Blog[];
+}
+
+export default function BlogList({ blogs }: BlogListProps) {
+  const router = useRouter();
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {blogs.map((blog) => (
         <div
           key={blog.id}
-          className="bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition duration-300 ease-in-out cursor-pointer"
+          className="border p-4 rounded-lg shadow-lg cursor-pointer bg-white hover:bg-gray-100 transition duration-300"
+          onClick={() => router.push(`/blogs/${blog.id}`)}
         >
-          <div className="p-6">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-4">{blog.title}</h3>
-            <p className="text-gray-600 text-base">{blog.content}</p>
-          </div>
+          <h2 className="text-xl font-bold text-black mb-2">{blog.title}</h2>
+          <p className="text-gray-700">{blog.content.slice(0, 100)}...</p>
         </div>
       ))}
     </div>
