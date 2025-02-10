@@ -1,5 +1,5 @@
 
-import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, Post, Query } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { Blog } from './blog.entity';
 
@@ -41,4 +41,28 @@ export class BlogsController{
         }
     }
 
+    @Get('pagnated')
+    async getBlogs(@Query('page') page:number=1 , @Query('limit') limit:number=5){
+
+        return this.blogsService.getPaginatedBlogs(page,limit)
+    }
+
+    @Delete(':id')
+    async deleteBlog(@Param('id') id:string){
+          
+        const deleted = this.blogsService.deleteBlog(Number(id))
+
+        if (!deleted){
+
+            throw new HttpException('Blog not found', HttpStatus.NOT_FOUND);
+
+        }
+
+        else{
+
+            return { message: 'Blog deleted successfully' };
+
+        }
+
+    }
 }

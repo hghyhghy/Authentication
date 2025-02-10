@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 // Blog type definition
 type Blog = {
@@ -11,14 +11,22 @@ type Blog = {
 };
 
 export default function AuthPage() {
-  const [username, setUsername] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [isLogin, setIsLogin] = useState<boolean>(true);
-  const [error, setError] = useState<string>(''); // State for error message
+  const [error, setError] = useState<string>("");
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const router = useRouter();
 
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (sessionStorage.getItem("isLoggedIn")) {
+      router.push("/blogs"); // Redirect logged-in users to blogs
+    }
+  }, []);
+
+  // Fetch blogs
   useEffect(() => {
     fetch("http://localhost:3000/blogs")
       .then((res) => res.json())
@@ -27,27 +35,27 @@ export default function AuthPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError(''); // Clear error message before making request
+    setError(""); // Clear previous error
 
-    const endpoint = isLogin ? '/users/login' : '/users/signup';
+    const endpoint = isLogin ? "/users/login" : "/users/signup";
 
     try {
       const response = await fetch(`http://localhost:3001${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
       });
 
       const responseBody = await response.json();
 
       if (response.status === 200) {
-        // Redirect to blogs page on successful login
-        router.push('/blogs'); // Using Next.js router for navigation
+        sessionStorage.setItem("isLoggedIn", "true"); // Store login state
+        router.push("/blogs"); // Redirect to blogs page
       } else {
-        setError(responseBody.message || 'Invalid credentials, please try again.');
+        setError(responseBody.message || "Invalid credentials, please try again.");
       }
     } catch (error) {
-      setError('An error occurred. Please try again later.');
+      setError("An error occurred. Please try again later.");
     }
   };
 
@@ -55,7 +63,7 @@ export default function AuthPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6 text-black">
-          {isLogin ? 'Login' : 'Signup'}
+          {isLogin ? "Login" : "Signup"}
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -96,22 +104,23 @@ export default function AuthPage() {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-3 rounded-lg hover:bg-blue-600 transition duration-300 "
+            className="w-full bg-black text-white py-3 rounded-lg hover:bg-blue-600 transition duration-300"
           >
-            {isLogin ? 'Login' : 'Signup'}
+            {isLogin ? "Login" : "Signup"}
           </button>
         </form>
 
         <button
           onClick={() => {
             setIsLogin(!isLogin);
-            setError(''); // Clear error message when switching forms
+            setError(""); // Clear error message when switching forms
           }}
           className="w-full mt-4 text-center text-blue-500 hover:underline"
         >
-          {isLogin ? 'Need an account? Signup' : 'Already have an account? Login'}
+          {isLogin ? "Need an account? Signup" : "Already have an account? Login"}
         </button>
       </div>
+
       {/* Blog List */}
       <div className="mt-10 w-full max-w-3xl">
         {blogs.map((blog) => (
@@ -127,4 +136,4 @@ export default function AuthPage() {
       </div>
     </div>
   );
-}
+}  
