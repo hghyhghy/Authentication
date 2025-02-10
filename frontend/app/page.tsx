@@ -60,8 +60,9 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <div className="relative min-h-screen bg-gray-100">
+      {/* Auth Box - Centered in the middle of the screen */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6 text-black">
           {isLogin ? "Login" : "Signup"}
         </h2>
@@ -122,7 +123,7 @@ export default function AuthPage() {
       </div>
 
       {/* Blog List */}
-      <div className="mt-10 w-full max-w-3xl">
+      <div className="mt-10 w-full max-w-3xl mx-auto">
         {blogs.map((blog) => (
           <div
             key={blog.id}
@@ -136,4 +137,4 @@ export default function AuthPage() {
       </div>
     </div>
   );
-}  
+}

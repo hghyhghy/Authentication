@@ -1,5 +1,5 @@
 
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Blog } from './blog.entity';
@@ -61,4 +61,33 @@ export class BlogsService{
         const result =  await this.blogsRepository.delete(id)
         return (result.affected ?? 0) > 0
     }
+
+    async getBlogCount(){
+
+        const totalBlogs= this.blogsRepository.count()
+        return {availableBlogs:totalBlogs}
+    }
+
+    async bookBlogs(userId:number,blogIds:number[]){
+
+        if (blogIds.length > 5){
+            throw new BadRequestException("You can only book upto 5 blogs")
+        }
+        const blogsToBook =  await this.blogsRepository.findByIds(blogIds)
+        if (blogsToBook.length  != blogIds.length){
+
+            throw new NotFoundException('One or more blogs do not exist.')
+        }
+
+        await this.blogsRepository.remove(blogsToBook)
+        const  remainingBlogs = await this.blogsRepository.count()
+
+        return {
+
+            message:"Blogs booked successfully",
+            remainingBlogs
+        }
+    }
+
+    
 }

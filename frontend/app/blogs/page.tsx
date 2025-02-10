@@ -15,6 +15,7 @@ export default function BlogsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [availableBlogs, setAvailableBlogs] = useState<number>(0);
   const limit = 5;
   const router = useRouter();
 
@@ -39,7 +40,18 @@ export default function BlogsPage() {
       }
     };
 
+    const fetchAvailableBlogs = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/blogs/count`);
+        const data = await response.json();
+        setAvailableBlogs(data.availableBlogs || 0);
+      } catch (error) {
+        console.error("Error fetching available blog count:", error);
+      }
+    };
+
     fetchBlogs();
+    fetchAvailableBlogs();
   }, [currentPage]);
 
   // Open confirmation modal
@@ -62,6 +74,7 @@ export default function BlogsPage() {
       }
 
       setBlogs((prevBlogs) => prevBlogs?.filter((blog) => blog.id !== deleteId) || []);
+      setAvailableBlogs((prev) => Math.max(prev - 1, 0));
     } catch (error) {
       console.error("Error deleting blog:", error);
     } finally {
@@ -76,6 +89,9 @@ export default function BlogsPage() {
 
   return (
     <>
+      <div className="text-center text-xl font-semibold mt-4">
+        Available Blogs: <span className="text-blue-600">{availableBlogs}</span>
+      </div>
 
       <div>
         {blogs === null ? (
